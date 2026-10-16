@@ -1,0 +1,7 @@
+{
+  "name": "CareFlow Health - Multi-Tenant Healthcare SaaS",
+  "description": "Unified healthcare operating system connecting patients, doctors, clinics, pharmacies, couriers, and administrators with role-specific clinical workspaces and operational management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
