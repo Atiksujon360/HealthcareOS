@@ -1,3 +1,7 @@
+import doctorAvatar from '../assets/images/dr_aisha_rahman_bd_1792175158336.jpg';
+import patientAvatar from '../assets/images/rafiqul_islam_avatar_1792177255976.jpg';
+import courierAvatar from '../assets/images/shamim_rider_avatar_1792177272324.jpg';
+
 import { 
   Appointment, 
   ConsultationEncounter, 
@@ -16,7 +20,7 @@ export const CURRENT_DOCTOR: UserProfile = {
   title: 'MBBS, FCPS (Medicine), MD (Endocrinology) · BMDC Reg: A-48291',
   role: 'doctor',
   email: 'dr.aisha.rahman@evercarebd.com',
-  avatarUrl: '/src/assets/images/dr_aisha_rahman_bd_1792175158336.jpg',
+  avatarUrl: doctorAvatar.src,
   organization: 'Evercare Hospital Dhaka & CareFlow Network',
   branch: 'Evercare Hospital (Bashundhara R/A, Dhaka)',
   specialty: 'Internal Medicine & Endocrinology',
@@ -28,7 +32,7 @@ export const CURRENT_PATIENT: UserProfile = {
   title: 'Health Card: BD-DHK-99420 · Dhanmondi, Dhaka',
   role: 'patient',
   email: 'rafiqul.islam.dhaka@gmail.com',
-  avatarUrl: '/src/assets/images/rafiqul_islam_avatar_1792177255976.jpg',
+  avatarUrl: patientAvatar.src,
   organization: 'CareFlow Health Bangladesh',
   branch: 'Popular Diagnostic (Dhanmondi Branch)',
 };
@@ -59,7 +63,7 @@ export const CURRENT_COURIER: UserProfile = {
   title: 'Express Medical Courier · Bike Fleet Dhaka',
   role: 'courier',
   email: 'shamim.rider@careflowbd.com',
-  avatarUrl: '/src/assets/images/shamim_rider_avatar_1792177272324.jpg',
+  avatarUrl: courierAvatar.src,
   organization: 'CareFlow Express Logistics BD',
   branch: 'Dhaka Central Hub (Dhanmondi / Gulshan Zone)',
 };
