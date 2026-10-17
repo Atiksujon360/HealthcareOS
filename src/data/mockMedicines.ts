@@ -577,7 +577,7 @@ export const SIMULATED_ONLINE_MEDICINES: MedicineCatalogItem[] = [
     genericName: 'Semaglutide Pre-filled Pen',
     strength: '0.5 mg / dose',
     dosageForm: 'Injection',
-    route: 'Subcutaneous / Intravenous (IV)',
+    route: 'Subcutaneous',
     manufacturer: 'Novo Nordisk (Imported Reference)',
     source: 'online_external',
     sourceLabel: 'External Web Reference (Unverified)',

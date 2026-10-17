@@ -23,7 +23,9 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { PrescriptionDrug } from '../../types';
-import { SmartPrescriptionBuilder } from './SmartPrescriptionBuilder';
+import { PrescriptionBuilder, MedicineSearch } from './components/PrescriptionBuilder';
+
+export { MedicineSearch, PrescriptionBuilder };
 
 export const ConsultationWorkspace: React.FC = () => {
   const { 
@@ -301,161 +303,12 @@ export const ConsultationWorkspace: React.FC = () => {
         </div>
       )}
 
-      {/* Tab 2: e-Prescriptions Drafting */}
+      {/* Tab 2: Smart e-Prescriptions Builder */}
       {activeTab === 'prescriptions' && (
-        <div className="space-y-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-base font-bold text-[#0A192F] font-display">
-                {language === 'bn' ? 'ই-প্রেসক্রিপশন তালিকা ও ঔষধ ব্যবস্থাপনা' : 'e-Prescription Order Management'}
-              </h3>
-              <p className="text-xs text-[#64748B]">
-                {language === 'bn' ? 'স্কয়ার, ইনসেপ্টা, বেক্সিমকো ও রেনেটা ঔষধ সরবরাহ নেটওয়ার্কের সাথে সরাসরি যুক্ত' : 'Direct integration with Square, Incepta, Beximco, and Renata pharmaceutical dispensaries'}
-              </p>
-            </div>
-
-            {!isSigned && (
-              <button
-                onClick={() => setShowAddRx(true)}
-                className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-[#0F766E] hover:bg-[#115E59] rounded-xl transition-colors shadow-xs"
-              >
-                <Plus className="w-4 h-4" />
-                {t('addMedicine')}
-              </button>
-            )}
-          </div>
-
-          {/* New Prescription Form Drawer/Modal */}
-          {showAddRx && (
-            <form onSubmit={handleAddDrug} className="p-5 bg-[#F8FAFC] border border-[#CBD5E1] rounded-2xl space-y-4 animate-in fade-in">
-              <div className="flex items-center justify-between pb-2 border-b border-[#E2E8F0]">
-                <span className="text-xs font-bold text-[#0A192F] uppercase tracking-wider">
-                  {language === 'bn' ? 'নতুন ঔষধ প্রেসক্রিপশনে যুক্ত করুন' : 'Add Medication to Prescription (℞)'}
-                </span>
-                <span className="text-xs text-[#64748B]">DGDA Bangladesh Pharmacopeia</span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="sm:col-span-2">
-                  <label className="block text-[11px] font-semibold text-[#0A192F] mb-1">{t('drugNameLabel')}</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Napa Extra, Seclo 20mg, Monas 10mg, Togent 10mg..."
-                    value={newDrugName}
-                    onChange={(e) => setNewDrugName(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-[#CBD5E1] rounded-xl text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-semibold text-[#0A192F] mb-1">{t('dosageLabel')}</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. 10 mg / 500 mg"
-                    value={newDosage}
-                    onChange={(e) => setNewDosage(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-[#CBD5E1] rounded-xl text-xs font-mono"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[11px] font-semibold text-[#0A192F] mb-1">{t('frequencyLabel')}</label>
-                  <select
-                    value={newFreq}
-                    onChange={(e) => setNewFreq(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-[#CBD5E1] rounded-xl text-xs"
-                  >
-                    <option value="1 + 0 + 0 (Daily morning after breakfast)">1 + 0 + 0 (Daily morning after breakfast)</option>
-                    <option value="1 + 0 + 1 (Twice daily after meals)">1 + 0 + 1 (Twice daily after meals)</option>
-                    <option value="1 + 1 + 1 (Three times daily after meals)">1 + 1 + 1 (Three times daily after meals)</option>
-                    <option value="0 + 0 + 1 (At bedtime)">0 + 0 + 1 (At bedtime)</option>
-                    <option value="As needed (PRN)">As needed (PRN)</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[11px] font-semibold text-[#0A192F] mb-1">{t('durationLabel')}</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. 14 Days / 30 Days"
-                    value={newDuration}
-                    onChange={(e) => setNewDuration(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-[#CBD5E1] rounded-xl text-xs"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-semibold text-[#0A192F] mb-1">{t('instructionsLabel')}</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Drink plenty of water, take 30 minutes before meal..."
-                  value={newInstructions}
-                  onChange={(e) => setNewInstructions(e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-[#CBD5E1] rounded-xl text-xs"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAddRx(false)}
-                  className="px-3 py-1.5 text-xs text-[#64748B] hover:text-[#0F172A]"
-                >
-                  {t('cancel')}
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-1.5 text-xs font-bold text-white bg-[#0F766E] hover:bg-[#115E59] rounded-xl"
-                >
-                  {t('addToPrescription')}
-                </button>
-              </div>
-            </form>
-          )}
-
-          {/* List of Prescribed Drugs */}
-          <div className="bg-white border border-[#E2E8F0] rounded-2xl shadow-xs divide-y divide-[#F1F5F9]">
-            {activeConsultation.prescriptions.map((rx) => (
-              <div key={rx.id} className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-[#F8FAFC]">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#E6F4F1] text-[#0F766E] flex items-center justify-center shrink-0">
-                    <Pill className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-sm text-[#0A192F]">{rx.drugName}</span>
-                      <span className="text-xs font-mono font-semibold text-[#0F766E] bg-[#E6F4F1] px-2 py-0.5 rounded">
-                        {rx.dosage}
-                      </span>
-                      <span className="text-xs font-semibold text-[#0F766E]">· {rx.frequency}</span>
-                    </div>
-                    <p className="text-xs text-[#475569] mt-1">{rx.instructions}</p>
-                    <span className="text-[11px] text-[#94A3B8] mt-0.5 block font-mono">{t('durationLabel')}: {rx.duration}</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 self-end sm:self-center">
-                  <span className={`text-xs px-2.5 py-1 rounded-md font-medium ${
-                    rx.dispensed ? 'bg-[#DCFCE7] text-[#15803D]' : 'bg-[#FEF3C7] text-[#B45309]'
-                  }`}>
-                    {rx.dispensed ? (language === 'bn' ? 'ডিসপেন্স সম্পন্ন' : 'Dispensed by Pharmacy') : (language === 'bn' ? 'যাচাই অপেক্ষমান' : 'Pending Verification')}
-                  </span>
-                  {!isSigned && (
-                    <button
-                      onClick={() => handleRemovePrescription(rx.id)}
-                      className="p-1.5 text-[#94A3B8] hover:text-[#B91C1C] rounded-lg transition-colors"
-                      title="Delete draft item"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <PrescriptionBuilder 
+          onOpenPreview={() => setShowPreviewModal(true)}
+          onOpenSignModal={() => setShowSignConfirmModal(true)}
+        />
       )}
 
       {/* Tab 3: Diagnostic Labs */}
@@ -616,7 +469,7 @@ export const ConsultationWorkspace: React.FC = () => {
             </div>
 
             {/* Official Rx Pad Document Content */}
-            <div className="p-6 sm:p-8 overflow-y-auto space-y-6 text-xs bg-white text-[#0A192F]">
+            <div id="printable-prescription" className="p-6 sm:p-8 overflow-y-auto space-y-6 text-xs bg-white text-[#0A192F]">
               {/* Doctor Letterhead */}
               <div className="border-b-2 border-[#0F766E] pb-4 flex flex-col sm:flex-row justify-between items-start gap-4">
                 <div>
@@ -706,18 +559,25 @@ export const ConsultationWorkspace: React.FC = () => {
                       <div key={rx.id} className="border-b border-[#F1F5F9] pb-2.5">
                         <div className="flex items-baseline justify-between">
                           <span className="font-bold text-sm text-[#0A192F]">
-                            {formatNum(idx + 1)}. Tab. {rx.drugName} {rx.dosage}
+                            {formatNum(idx + 1)}. {rx.dosageForm ? `${rx.dosageForm}. ` : ''}{rx.drugName} {rx.dosage || rx.strength || ''}
                           </span>
                           <span className="font-mono text-[11px] font-semibold text-[#0F766E]">
                             ({rx.duration})
                           </span>
                         </div>
+                        {rx.genericName && (
+                          <p className="text-[11px] text-[#64748B] font-mono italic">
+                            ({rx.genericName})
+                          </p>
+                        )}
                         <p className="text-xs font-bold text-[#0F766E] mt-0.5">
-                          {rx.frequency}
+                          ℞ {rx.frequency} {rx.route && rx.route !== 'Oral' ? `· [${rx.route}]` : ''} {rx.quantity ? `· Qty: ${rx.quantity}` : ''}
                         </p>
-                        <p className="text-[11px] text-[#64748B] mt-0.5">
-                          {rx.instructions}
-                        </p>
+                        {rx.instructions && (
+                          <p className="text-[11px] text-[#475569] mt-0.5">
+                            {rx.instructions}
+                          </p>
+                        )}
                       </div>
                     ))}
                   </div>

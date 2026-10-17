@@ -82,6 +82,7 @@ export type RouteOfAdministration =
   | 'Sublingual' 
   | 'Intravenous (IV)' 
   | 'Intramuscular (IM)' 
+  | 'Subcutaneous'
   | 'Inhalation' 
   | 'Topical' 
   | 'Ophthalmic' 

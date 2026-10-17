@@ -349,7 +349,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         actor: CURRENT_DOCTOR.name,
         role: 'Doctor',
         action: 'Prescription Unlocked for Clinical Amendment',
-        module: 'Prescriptions',
+        module: 'Clinical',
         details: `Encounter #${activeConsultation.id} unlocked. Clinical Reason: ${reason}`,
         ipAddress: '192.168.1.104',
       },
