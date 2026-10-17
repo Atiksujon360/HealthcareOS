@@ -22,12 +22,16 @@ import {
   UserCheck,
   CheckCircle2,
   AlertTriangle,
+  AlertCircle,
   Info,
   DollarSign,
-  Globe
+  Globe,
+  Sparkles,
+  Award
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { UserRole } from '../../types';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface NavItem {
   id: string;
@@ -67,6 +71,9 @@ export const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       case 'doctor':
         return [
           { id: 'doctor/dashboard', label: t('navOverview'), icon: Activity },
+          { id: 'doctor/specialist', label: language === 'bn' ? 'স্পেশালিস্ট কেস সেন্টার' : 'Specialist Case Hub', icon: Award, badge: 'Pro' },
+          { id: 'doctor/chamber', label: language === 'bn' ? 'সোলো চেম্বার ও সিরিয়াল' : 'Chamber & Serials', icon: Building2, badge: 'Multi' },
+          { id: 'doctor/careloop', label: language === 'bn' ? 'কেয়ারলুপ এআই' : 'CareLoop AI', icon: Sparkles, badge: 'Prevention' },
           { id: 'doctor/schedule', label: t('navSchedule'), icon: Calendar, badge: '5' },
           { id: 'doctor/patients', label: t('navPatients'), icon: Users },
           { id: 'doctor/consultations/enc-2026-101', label: t('navConsultations'), icon: Stethoscope, badge: 'Draft' },
@@ -76,6 +83,7 @@ export const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       case 'patient':
         return [
           { id: 'patient/dashboard', label: t('navMyHealthHub'), icon: Activity },
+          { id: 'patient/careloop', label: language === 'bn' ? 'কেয়ার জার্নি ও গ্যাপ' : 'Care Journey & Steps', icon: Sparkles, badge: 'Next Steps' },
           { id: 'patient/appointments', label: t('navAppointments'), icon: Calendar, badge: '10:00 AM' },
           { id: 'patient/records', label: t('navRecords'), icon: FileText },
           { id: 'patient/prescriptions', label: t('navPrescriptions'), icon: Pill },
@@ -85,6 +93,8 @@ export const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       case 'clinic_admin':
         return [
           { id: 'clinic/dashboard', label: t('navOperations'), icon: Building2 },
+          { id: 'clinic/assistant', label: language === 'bn' ? 'চেম্বার অ্যাসিস্ট্যান্ট' : 'Assistant & Queue', icon: UserCheck, badge: 'Staff' },
+          { id: 'clinic/careloop', label: language === 'bn' ? 'কেয়ারলুপ কোঅর্ডিনেশন' : 'CareLoop Prevention', icon: Sparkles, badge: 'Active' },
           { id: 'clinic/queue', label: t('navQueue'), icon: Clock, badge: '3 Waiting' },
           { id: 'clinic/doctors', label: t('navDoctors'), icon: Stethoscope },
           { id: 'clinic/appointments', label: t('navMasterSchedule'), icon: Calendar },
@@ -691,10 +701,63 @@ export const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => 
           </div>
         )}
 
-        {/* Viewport Content */}
+        {/* Viewport Content with Smooth Page Transitions */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-[1440px] w-full mx-auto">
-          {children}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeView}
+              initial={{ opacity: 0, y: 10, scale: 0.995 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -6, scale: 0.995 }}
+              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </main>
+
+        {/* Animated Toast Notification Stack */}
+        <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none">
+          <AnimatePresence>
+            {toasts.map((toast) => (
+              <motion.div
+                key={toast.id}
+                initial={{ opacity: 0, y: 20, scale: 0.92 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95, transition: { duration: 0.15 } }}
+                transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+                className={`pointer-events-auto p-4 rounded-2xl shadow-xl border flex items-start gap-3 backdrop-blur-md ${
+                  toast.type === 'success' ? 'bg-white/95 border-[#86EFAC] text-[#0A192F]' :
+                  toast.type === 'error' ? 'bg-white/95 border-[#FCA5A5] text-[#0A192F]' :
+                  toast.type === 'warning' ? 'bg-white/95 border-[#FCD34D] text-[#0A192F]' :
+                  'bg-white/95 border-[#99F6E4] text-[#0A192F]'
+                }`}
+              >
+                <div className={`p-1.5 rounded-xl shrink-0 mt-0.5 ${
+                  toast.type === 'success' ? 'bg-[#DCFCE7] text-[#15803D]' :
+                  toast.type === 'error' ? 'bg-[#FEE2E2] text-[#DC2626]' :
+                  toast.type === 'warning' ? 'bg-[#FEF3C7] text-[#D97706]' :
+                  'bg-[#E6F4F1] text-[#0F766E]'
+                }`}>
+                  {toast.type === 'success' ? <CheckCircle2 className="w-4 h-4" /> :
+                   toast.type === 'error' ? <AlertTriangle className="w-4 h-4" /> :
+                   toast.type === 'warning' ? <AlertCircle className="w-4 h-4" /> :
+                   <Info className="w-4 h-4" />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-xs font-bold text-[#0A192F] font-display">{toast.title}</h4>
+                  <p className="text-[11px] text-[#475569] mt-0.5 leading-relaxed">{toast.message}</p>
+                </div>
+                <button
+                  onClick={() => removeToast(toast.id)}
+                  className="text-[#94A3B8] hover:text-[#0A192F] p-1 shrink-0 transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );

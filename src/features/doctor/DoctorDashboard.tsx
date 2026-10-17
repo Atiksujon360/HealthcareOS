@@ -21,10 +21,18 @@ import {
   Eye,
   MapPin,
   ShieldCheck,
-  BadgeAlert
+  BadgeAlert,
+  Sparkles
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useApp } from '../../context/AppContext';
 import { Appointment } from '../../types';
+import { 
+  LiveECGMonitor, 
+  AnimatedCareRadar, 
+  AnimatedCounter, 
+  CelebrationBurst 
+} from '../../components/common/AnimatedTelemetry';
 
 export const DoctorDashboard: React.FC = () => {
   const { 
@@ -37,8 +45,12 @@ export const DoctorDashboard: React.FC = () => {
     t,
     language,
     formatBDT,
-    formatNum
+    formatNum,
+    careGaps
   } = useApp();
+
+  const [showCelebration, setShowCelebration] = useState<boolean>(false);
+  const [celebrationMsg, setCelebrationMsg] = useState<string>('');
 
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
@@ -66,7 +78,17 @@ export const DoctorDashboard: React.FC = () => {
   });
 
   const toggleTask = (id: string) => {
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t));
+    setTasks(prev => prev.map(t => {
+      if (t.id === id) {
+        const nextDone = !t.done;
+        if (nextDone) {
+          setCelebrationMsg(language === 'bn' ? 'ক্লিনিক্যাল টাস্ক সম্পন্ন হয়েছে!' : 'Clinical Task Completed!');
+          setShowCelebration(true);
+        }
+        return { ...t, done: nextDone };
+      }
+      return t;
+    }));
     addToast({
       type: 'info',
       title: language === 'bn' ? 'ক্লিনিক্যাল টাস্ক হালনাগাদ হয়েছে' : 'Clinical Task Updated',
@@ -154,10 +176,13 @@ export const DoctorDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* KPI Cards Strip */}
+      {/* KPI Cards Strip with Motion and Animated Counters */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1 */}
-        <div className="bg-white border border-[#E2E8F0] rounded-2xl p-4 shadow-xs">
+        <motion.div 
+          whileHover={{ y: -3, transition: { duration: 0.2 } }}
+          className="bg-white border border-[#E2E8F0] rounded-2xl p-4 shadow-xs card-interactive"
+        >
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-[#64748B]">{t('todayAppointments')}</span>
             <div className="w-8 h-8 rounded-xl bg-[#E6F4F1] text-[#0F766E] flex items-center justify-center">
@@ -165,17 +190,22 @@ export const DoctorDashboard: React.FC = () => {
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-2xl font-extrabold text-[#0A192F] font-mono tabular-nums">{formatNum(14)}</span>
+            <span className="text-2xl font-extrabold text-[#0A192F] font-mono tabular-nums">
+              <AnimatedCounter value={14} />
+            </span>
             <span className="text-[11px] font-medium text-[#15803D] flex items-center gap-0.5">
               <TrendingUp className="w-3 h-3" />
               {language === 'bn' ? '+২ গড় অপেক্ষা' : '+2 vs avg'}
             </span>
           </div>
           <p className="text-[11px] text-[#64748B] mt-1">{t('virtualAndInClinic')}</p>
-        </div>
+        </motion.div>
 
         {/* Card 2 */}
-        <div className="bg-white border border-[#E2E8F0] rounded-2xl p-4 shadow-xs">
+        <motion.div 
+          whileHover={{ y: -3, transition: { duration: 0.2 } }}
+          className="bg-white border border-[#E2E8F0] rounded-2xl p-4 shadow-xs card-interactive"
+        >
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-[#64748B]">{t('waitingTriage')}</span>
             <div className="w-8 h-8 rounded-xl bg-[#FEF3C7] text-[#B45309] flex items-center justify-center">
@@ -183,14 +213,19 @@ export const DoctorDashboard: React.FC = () => {
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-2xl font-extrabold text-[#0A192F] font-mono tabular-nums">{formatNum(3)}</span>
+            <span className="text-2xl font-extrabold text-[#0A192F] font-mono tabular-nums">
+              <AnimatedCounter value={3} />
+            </span>
             <span className="text-[11px] text-[#B45309] font-medium">{t('avgWait')}</span>
           </div>
           <p className="text-[11px] text-[#64748B] mt-1">{t('nextPatient')}</p>
-        </div>
+        </motion.div>
 
         {/* Card 3 */}
-        <div className="bg-white border border-[#E2E8F0] rounded-2xl p-4 shadow-xs">
+        <motion.div 
+          whileHover={{ y: -3, transition: { duration: 0.2 } }}
+          className="bg-white border border-[#E2E8F0] rounded-2xl p-4 shadow-xs card-interactive"
+        >
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-[#64748B]">{t('completedConsultations')}</span>
             <div className="w-8 h-8 rounded-xl bg-[#DCFCE7] text-[#15803D] flex items-center justify-center">
@@ -198,14 +233,19 @@ export const DoctorDashboard: React.FC = () => {
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-2xl font-extrabold text-[#0A192F] font-mono tabular-nums">{formatNum(8)}</span>
+            <span className="text-2xl font-extrabold text-[#0A192F] font-mono tabular-nums">
+              <AnimatedCounter value={8} />
+            </span>
             <span className="text-[11px] text-[#15803D] font-medium">{formatNum(57)}% {language === 'bn' ? 'সম্পন্ন' : 'completed'}</span>
           </div>
           <p className="text-[11px] text-[#64748B] mt-1">{t('signedPrescriptions')}</p>
-        </div>
+        </motion.div>
 
         {/* Card 4 */}
-        <div className="bg-white border border-[#E2E8F0] rounded-2xl p-4 shadow-xs">
+        <motion.div 
+          whileHover={{ y: -3, transition: { duration: 0.2 } }}
+          className="bg-white border border-[#E2E8F0] rounded-2xl p-4 shadow-xs card-interactive"
+        >
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-[#64748B]">{t('pendingDocumentation')}</span>
             <div className="w-8 h-8 rounded-xl bg-[#EEE9FF] text-[#4F7DF3] flex items-center justify-center">
@@ -213,12 +253,28 @@ export const DoctorDashboard: React.FC = () => {
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-2xl font-extrabold text-[#0A192F] font-mono tabular-nums">{formatNum(2)}</span>
+            <span className="text-2xl font-extrabold text-[#0A192F] font-mono tabular-nums">
+              <AnimatedCounter value={2} />
+            </span>
             <span className="text-[11px] text-[#B45309] font-medium">{language === 'bn' ? 'খসড়া এনকাউন্টার' : 'Draft encounters'}</span>
           </div>
           <p className="text-[11px] text-[#64748B] mt-1">{t('draftSavedIndicator')}</p>
-        </div>
+        </motion.div>
       </div>
+
+      {/* Animated Live CareLoop Radar Engine Banner */}
+      <AnimatedCareRadar
+        activeGapsCount={careGaps?.filter(g => g.status !== 'resolved' && g.status !== 'disputed')?.length || 4}
+        totalMonitored={18}
+        onScanClick={() => {
+          setActiveView('doctor/careloop');
+          addToast({
+            type: 'info',
+            title: language === 'bn' ? 'কেয়ারলুপ রাডার স্ক্যান সক্রিয়' : 'CareLoop Radar Scan Active',
+            message: language === 'bn' ? 'সকল অমীমাংসিত ফলো-আপ এবং ল্যাব গ্যাপ বিশ্লেষণ করা হচ্ছে।' : 'Scanning all pending follow-up and investigation loops.',
+          });
+        }}
+      />
 
       {/* Main Grid: Appointments & Clinical Panels */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -517,11 +573,17 @@ export const DoctorDashboard: React.FC = () => {
               <span>Blood: B+</span>
               <span>SpO2: 99%</span>
             </div>
+
+            {/* Live Telemetry Animated Monitor */}
+            <div className="mt-3">
+              <LiveECGMonitor bpm={74} label="Live Rhythm Strip" status="normal" />
+            </div>
+
             <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
               <span className="text-slate-300 font-mono">MRN: EVR-DHK-784920</span>
               <button
                 onClick={() => setActiveView('doctor/consultations/enc-2026-101')}
-                className="px-3.5 py-1.5 bg-[#0F766E] hover:bg-[#115E59] text-white font-bold rounded-xl text-xs flex items-center gap-1 transition-colors"
+                className="px-3.5 py-1.5 bg-[#0F766E] hover:bg-[#115E59] text-white font-bold rounded-xl text-xs flex items-center gap-1 transition-colors btn-interactive"
               >
                 {t('resumeChart')}
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -745,6 +807,13 @@ export const DoctorDashboard: React.FC = () => {
           </form>
         </div>
       )}
+
+      {/* Animated Celebration Burst for clinical milestones */}
+      <CelebrationBurst 
+        show={showCelebration} 
+        message={celebrationMsg} 
+        onComplete={() => setShowCelebration(false)} 
+      />
     </div>
   );
 };

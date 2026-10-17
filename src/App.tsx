@@ -12,11 +12,27 @@ import { CourierDashboard } from './features/courier/CourierDashboard';
 import { AdminDashboard } from './features/admin/AdminDashboard';
 import { LandingPage } from './features/public/LandingPage';
 import { SubscriptionPlans } from './features/billing/SubscriptionPlans';
+import { CareLoopDashboard } from './features/careloop/CareLoopDashboard';
+import { SpecialistCaseCommandCenter } from './features/specialist/SpecialistCaseCommandCenter';
+import { AssistantWorkspace } from './features/assistant/AssistantWorkspace';
 
 const MainRouter: React.FC = () => {
   const { activeView } = useApp();
 
   const renderCurrentView = () => {
+    // Specialist Professor Case Command Center & Solo Chamber Operations
+    if (activeView.includes('specialist') || activeView === 'doctor/chamber' || activeView === 'chamber/operations') {
+      return <SpecialistCaseCommandCenter />;
+    }
+
+    // Delegated Chamber Assistant & Secretary Workspace
+    if (activeView.includes('assistant')) {
+      return <AssistantWorkspace />;
+    }
+
+    // CareLoop AI Universal Route
+    if (activeView.includes('careloop')) return <CareLoopDashboard />;
+
     // Doctor Views
     if (activeView === 'doctor/dashboard') return <DoctorDashboard />;
     if (activeView.startsWith('doctor/consultations')) return <ConsultationWorkspace />;

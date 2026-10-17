@@ -9,13 +9,22 @@ import {
   ChevronRight, 
   AlertTriangle,
   Stethoscope,
-  MapPin
+  MapPin,
+  Sparkles
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { PatientRecord } from '../../types';
 
 export const DoctorPatients: React.FC = () => {
-  const { patientRecords, setActiveView, language, t, formatNum } = useApp();
+  const { 
+    patientRecords, 
+    setActiveView, 
+    language, 
+    t, 
+    formatNum,
+    careGaps,
+    setActiveCareLoopPatientId
+  } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPatient, setSelectedPatient] = useState<PatientRecord | null>(patientRecords[0] || null);
 
@@ -68,6 +77,9 @@ export const DoctorPatients: React.FC = () => {
           <div className="divide-y divide-[#F1F5F9]">
             {filtered.map((patient) => {
               const isSelected = selectedPatient?.id === patient.id;
+              const gaps = careGaps.filter(g => g.patientId === patient.id && (g.status === 'active' || g.status === 'in_progress'));
+              const hasCritical = gaps.some(g => g.severity === 'critical');
+
               return (
                 <div
                   key={patient.id}
@@ -88,6 +100,14 @@ export const DoctorPatients: React.FC = () => {
                       <p className="text-xs text-[#64748B] truncate mt-0.5">
                         {patient.chronicConditions.join(' · ')}
                       </p>
+                      {gaps.length > 0 && (
+                        <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 ${
+                          hasCritical ? 'bg-[#FEE2E2] text-[#DC2626]' : 'bg-[#FFFBEB] text-[#B45309]'
+                        }`}>
+                          <Sparkles className="w-2.5 h-2.5" />
+                          {formatNum(gaps.length)} {language === 'bn' ? 'কেয়ার গ্যাপ' : 'Care Gaps'}
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -118,6 +138,39 @@ export const DoctorPatients: React.FC = () => {
                   {t('openWorkspace')}
                 </button>
               </div>
+
+              {/* CareLoop Continuity Summary */}
+              {(() => {
+                const pGaps = careGaps.filter(g => g.patientId === selectedPatient.id && (g.status === 'active' || g.status === 'in_progress'));
+                return (
+                  <div className="p-4 bg-gradient-to-r from-[#F0FDFA] to-[#E6F4F1] border border-[#99F6E4] rounded-2xl">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-[#0F766E] uppercase tracking-wider font-display">
+                        <Sparkles className="w-3.5 h-3.5" />
+                        <span>CareLoop Continuity</span>
+                      </div>
+                      <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-white text-[#0F766E] border border-[#99F6E4]">
+                        {formatNum(pGaps.length)} {language === 'bn' ? 'সক্রিয় গ্যাপ' : 'Active Gaps'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-[#334155] leading-relaxed mb-3">
+                      {pGaps.length > 0 
+                        ? pGaps.map(g => g.title).join(' · ')
+                        : (language === 'bn' ? 'ক্লিনিক্যাল কন্টিনিউইটি সন্তোষজনক। কোনো অমীমাংসিত কেয়ার গ্যাপ নেই।' : 'Continuity status optimal. No unresolved care gaps.')}
+                    </p>
+                    <button
+                      onClick={() => {
+                        setActiveCareLoopPatientId(selectedPatient.id);
+                        setActiveView('doctor/careloop');
+                      }}
+                      className="w-full py-2 bg-[#0F766E] hover:bg-[#115E59] text-white text-xs font-bold rounded-xl transition-colors shadow-2xs flex items-center justify-center gap-1.5"
+                    >
+                      <span>{language === 'bn' ? 'কেয়ারলুপ প্রিভেনশন কনসোল খুলুন' : 'Open CareLoop Prevention'}</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                );
+              })()}
 
               {/* Allergy Warning */}
               <div className="p-3.5 bg-[#FEF2F2] border border-[#FEE2E2] rounded-2xl">
