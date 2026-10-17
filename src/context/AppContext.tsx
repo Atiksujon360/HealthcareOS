@@ -28,6 +28,17 @@ import {
   MOCK_ORGANIZATIONS,
   MOCK_AUDIT_LOGS,
 } from '../data/mockData';
+import { 
+  CareGap, 
+  CareJourneyEvent, 
+  OutreachRecord, 
+  PatientBarrier 
+} from '../types/careLoop';
+import { 
+  INITIAL_CARE_GAPS, 
+  INITIAL_CARE_JOURNEY_EVENTS 
+} from '../data/mockCareLoopData';
+import { CareLoopEngine } from '../services/careLoopEngine';
 
 import { TRANSLATIONS, Language, formatCurrency, formatNumber } from '../locales/translations';
 
@@ -90,6 +101,19 @@ interface AppContextType {
   // Search & Filters
   globalSearchQuery: string;
   setGlobalSearchQuery: (q: string) => void;
+
+  // HealthcareOS CareLoop AI - Care Continuity Engine
+  careGaps: CareGap[];
+  careJourneyEvents: CareJourneyEvent[];
+  outreachRecords: OutreachRecord[];
+  activeCareLoopPatientId: string;
+  setActiveCareLoopPatientId: (id: string) => void;
+  resolveCareGap: (gapId: string, evidence: string) => void;
+  disputeCareGap: (gapId: string, justification: string) => void;
+  reassignCareGap: (gapId: string, newOwner: { id: string; name: string; role: string }, note?: string) => void;
+  updateCareGapBarrier: (gapId: string, barrier: PatientBarrier) => void;
+  sendCareGapOutreach: (gapId: string, channel: 'WhatsApp' | 'SMS' | 'Phone Call', customMessage?: string) => void;
+  addCareJourneyEvent: (event: Omit<CareJourneyEvent, 'id' | 'timestamp'>) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -131,6 +155,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [organizations] = useState<OrganizationTenant[]>(MOCK_ORGANIZATIONS);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(MOCK_AUDIT_LOGS);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+  // HealthcareOS CareLoop AI States
+  const [careGaps, setCareGaps] = useState<CareGap[]>(INITIAL_CARE_GAPS);
+  const [careJourneyEvents, setCareJourneyEvents] = useState<CareJourneyEvent[]>(INITIAL_CARE_JOURNEY_EVENTS);
+  const [outreachRecords, setOutreachRecords] = useState<OutreachRecord[]>([]);
+  const [activeCareLoopPatientId, setActiveCareLoopPatientId] = useState<string>('pat-101');
 
   const addToast = (toast: Omit<ToastMessage, 'id'>) => {
     const id = Math.random().toString(36).substring(2, 9);
@@ -500,6 +530,257 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     });
   };
 
+  // HealthcareOS CareLoop AI Handlers
+  const resolveCareGap = (gapId: string, evidence: string) => {
+    const targetGap = careGaps.find(g => g.id === gapId);
+    if (!targetGap) return;
+
+    const now = new Date().toLocaleString();
+    const actorName = getCurrentUser().name;
+
+    setCareGaps(prev => prev.map(g => g.id === gapId ? {
+      ...g,
+      status: 'resolved',
+      resolutionEvidence: evidence,
+      resolvedAt: now,
+      resolvedBy: actorName
+    } : g));
+
+    const newEvent: CareJourneyEvent = {
+      id: `evt-${Date.now().toString().slice(-4)}`,
+      patientId: targetGap.patientId,
+      patientName: targetGap.patientName,
+      type: 'task_completed',
+      title: `Care Gap Resolved: ${targetGap.title}`,
+      description: `Action completed and clinically substantiated: "${evidence}"`,
+      timestamp: now,
+      status: 'completed',
+      responsiblePerson: {
+        name: actorName,
+        role: getCurrentUser().role,
+        facility: selectedBranch
+      },
+      source: 'Care Coordinator',
+      evidence,
+      associatedGapId: gapId
+    };
+
+    setCareJourneyEvents(prev => [newEvent, ...prev]);
+
+    setAuditLogs(prev => [{
+      id: `log-${Date.now().toString().slice(-4)}`,
+      timestamp: now,
+      actor: actorName,
+      role: getCurrentUser().role,
+      action: 'Care Gap Clinically Resolved',
+      module: 'Clinical',
+      details: `Gap #${gapId} ("${targetGap.title}") resolved with evidence: ${evidence}`,
+      ipAddress: '10.240.12.84'
+    }, ...prev]);
+
+    addToast({
+      type: 'success',
+      title: language === 'bn' ? 'কেয়ার গ্যাপ সফলভাবে সমাপ্ত হয়েছে' : 'Care Gap Resolved',
+      message: language === 'bn' 
+        ? `ক্লিনিক্যাল এভিডেন্স সংরক্ষণ করা হয়েছে: ${targetGap.title}` 
+        : `Verified evidence recorded and care loop successfully closed for ${targetGap.patientName}.`
+    });
+  };
+
+  const disputeCareGap = (gapId: string, justification: string) => {
+    const targetGap = careGaps.find(g => g.id === gapId);
+    if (!targetGap) return;
+
+    const now = new Date().toLocaleString();
+    const actorName = getCurrentUser().name;
+
+    setCareGaps(prev => prev.map(g => g.id === gapId ? {
+      ...g,
+      status: 'disputed',
+      disputeJustification: justification,
+      disputedAt: now,
+      disputedBy: actorName
+    } : g));
+
+    const newEvent: CareJourneyEvent = {
+      id: `evt-${Date.now().toString().slice(-4)}`,
+      patientId: targetGap.patientId,
+      patientName: targetGap.patientName,
+      type: 'task_cancelled',
+      title: `Clinical Override / Disputed: ${targetGap.title}`,
+      description: `Clinician determined action is clinically inappropriate: "${justification}"`,
+      timestamp: now,
+      status: 'disputed',
+      responsiblePerson: {
+        name: actorName,
+        role: getCurrentUser().role,
+        facility: selectedBranch
+      },
+      source: 'EMR',
+      evidence: justification,
+      associatedGapId: gapId
+    };
+
+    setCareJourneyEvents(prev => [newEvent, ...prev]);
+
+    setAuditLogs(prev => [{
+      id: `log-${Date.now().toString().slice(-4)}`,
+      timestamp: now,
+      actor: actorName,
+      role: getCurrentUser().role,
+      action: 'Care Gap Clinically Disputed',
+      module: 'Clinical',
+      details: `Gap #${gapId} overridden by physician: ${justification}`,
+      ipAddress: '10.240.12.84'
+    }, ...prev]);
+
+    addToast({
+      type: 'info',
+      title: language === 'bn' ? 'ক্লিনিক্যাল ওভাররাইড রেকর্ড করা হয়েছে' : 'Care Gap Disputed & Overridden',
+      message: language === 'bn' ? 'চিকিৎসকের যুক্তি অডিট ট্রেইলে যুক্ত করা হয়েছে।' : 'Clinical justification logged with supervisor audit trail.'
+    });
+  };
+
+  const reassignCareGap = (gapId: string, newOwner: { id: string; name: string; role: string }, note?: string) => {
+    const targetGap = careGaps.find(g => g.id === gapId);
+    if (!targetGap) return;
+
+    const now = new Date().toLocaleString();
+    setCareGaps(prev => prev.map(g => g.id === gapId ? {
+      ...g,
+      accountableOwner: newOwner,
+      status: 'in_progress',
+      escalationStatus: `Reassigned to ${newOwner.name} (${newOwner.role})`
+    } : g));
+
+    const newEvent: CareJourneyEvent = {
+      id: `evt-${Date.now().toString().slice(-4)}`,
+      patientId: targetGap.patientId,
+      patientName: targetGap.patientName,
+      type: 'care_coordination_task_assigned',
+      title: `Accountable Owner Reassigned to ${newOwner.name}`,
+      description: note || `Task reassigned to ${newOwner.role} for accelerated follow-through.`,
+      timestamp: now,
+      status: 'pending',
+      responsiblePerson: {
+        name: newOwner.name,
+        role: newOwner.role,
+        facility: selectedBranch
+      },
+      source: 'Care Coordinator',
+      associatedGapId: gapId
+    };
+
+    setCareJourneyEvents(prev => [newEvent, ...prev]);
+
+    addToast({
+      type: 'info',
+      title: language === 'bn' ? 'দায়িত্বপ্রাপ্ত ব্যক্তি পরিবর্তিত হয়েছে' : 'Owner Reassigned',
+      message: `Accountability transferred to ${newOwner.name} (${newOwner.role}).`
+    });
+  };
+
+  const updateCareGapBarrier = (gapId: string, barrier: PatientBarrier) => {
+    const targetGap = careGaps.find(g => g.id === gapId);
+    if (!targetGap) return;
+
+    const now = new Date().toLocaleString();
+    setCareGaps(prev => prev.map(g => g.id === gapId ? {
+      ...g,
+      barrier: {
+        ...barrier,
+        reportedAt: now
+      }
+    } : g));
+
+    const newEvent: CareJourneyEvent = {
+      id: `evt-${Date.now().toString().slice(-4)}`,
+      patientId: targetGap.patientId,
+      patientName: targetGap.patientName,
+      type: 'barrier_reported',
+      title: `Patient Barrier Reported: ${barrier.type.toUpperCase().replace('_', ' ')}`,
+      description: barrier.description,
+      timestamp: now,
+      status: 'pending',
+      responsiblePerson: {
+        name: getCurrentUser().name,
+        role: getCurrentUser().role,
+        facility: selectedBranch
+      },
+      source: 'Patient App',
+      associatedGapId: gapId
+    };
+
+    setCareJourneyEvents(prev => [newEvent, ...prev]);
+
+    addToast({
+      type: 'warning',
+      title: language === 'bn' ? 'রোগীর প্রতিবন্ধকতা নথিভুক্ত হয়েছে' : 'Patient Barrier Documented',
+      message: `${barrier.type.toUpperCase()} barrier recorded. Suggested intervention triggered.`
+    });
+  };
+
+  const sendCareGapOutreach = (gapId: string, channel: 'WhatsApp' | 'SMS' | 'Phone Call', customMessage?: string) => {
+    const targetGap = careGaps.find(g => g.id === gapId);
+    if (!targetGap) return;
+
+    const now = new Date().toLocaleString();
+    const finalMessage = customMessage || CareLoopEngine.generateOutreachTemplate(targetGap, language, channel);
+
+    const record: OutreachRecord = {
+      id: `out-${Date.now().toString().slice(-4)}`,
+      gapId,
+      patientId: targetGap.patientId,
+      channel,
+      recipientPhone: '+880 1711-238910',
+      messageContent: finalMessage,
+      sentAt: now,
+      status: 'delivered'
+    };
+
+    setOutreachRecords(prev => [record, ...prev]);
+
+    setCareGaps(prev => prev.map(g => g.id === gapId ? {
+      ...g,
+      status: 'in_progress',
+      escalationStatus: `Outreach dispatched via ${channel}`
+    } : g));
+
+    const newEvent: CareJourneyEvent = {
+      id: `evt-${Date.now().toString().slice(-4)}`,
+      patientId: targetGap.patientId,
+      patientName: targetGap.patientName,
+      type: 'care_coordination_task_assigned',
+      title: `Patient Outreach Dispatched via ${channel}`,
+      description: `Bilingual reminder sent to patient phone (+880 1711-238910): "${finalMessage.slice(0, 90)}..."`,
+      timestamp: now,
+      status: 'completed',
+      responsiblePerson: {
+        name: getCurrentUser().name,
+        role: getCurrentUser().role,
+        facility: selectedBranch
+      },
+      source: 'Care Coordinator',
+      associatedGapId: gapId
+    };
+
+    setCareJourneyEvents(prev => [newEvent, ...prev]);
+
+    addToast({
+      type: 'success',
+      title: language === 'bn' ? `${channel} বার্তা সফলভাবে পাঠানো হয়েছে` : `${channel} Outreach Dispatched`,
+      message: language === 'bn' 
+        ? `${targetGap.patientName}-এর কাছে কেয়ারলুপ বার্তা পৌঁছেছে।` 
+        : `Patient continuity communication delivered to ${targetGap.patientName}.`
+    });
+  };
+
+  const addCareJourneyEvent = (event: Omit<CareJourneyEvent, 'id' | 'timestamp'>) => {
+    const now = new Date().toLocaleString();
+    const id = `evt-${Date.now().toString().slice(-4)}`;
+    setCareJourneyEvents(prev => [{ ...event, id, timestamp: now }, ...prev]);
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -543,6 +824,17 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         removeToast,
         globalSearchQuery,
         setGlobalSearchQuery,
+        careGaps,
+        careJourneyEvents,
+        outreachRecords,
+        activeCareLoopPatientId,
+        setActiveCareLoopPatientId,
+        resolveCareGap,
+        disputeCareGap,
+        reassignCareGap,
+        updateCareGapBarrier,
+        sendCareGapOutreach,
+        addCareJourneyEvent,
       }}
     >
       {children}
