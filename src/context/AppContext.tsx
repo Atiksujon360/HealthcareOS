@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { 
   UserRole, 
   UserProfile, 
@@ -40,7 +40,7 @@ import {
 } from '../data/mockCareLoopData';
 import { CareLoopEngine } from '../services/careLoopEngine';
 
-import { TRANSLATIONS, Language, formatCurrency, formatNumber } from '../locales/translations';
+import { TRANSLATIONS, Language, formatCurrency, formatNumber, normalizeLocalizedText } from '../locales/translations';
 
 export interface ToastMessage {
   id: string;
@@ -119,6 +119,7 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  // Keep the initial render deterministic for SSR hydration. Restore the preference after mount.
   const [language, setLanguageState] = useState<Language>('en');
   const [currentRole, setCurrentRoleState] = useState<UserRole>('doctor');
   const [activeView, setActiveView] = useState<string>('doctor/dashboard');
@@ -126,7 +127,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [globalSearchQuery, setGlobalSearchQuery] = useState<string>('');
 
   const t = (key: keyof typeof TRANSLATIONS['en']): string => {
-    return TRANSLATIONS[language]?.[key] || TRANSLATIONS['en'][key] || key;
+    return normalizeLocalizedText(TRANSLATIONS[language]?.[key] || TRANSLATIONS['en'][key] || key);
   };
 
   const formatBDT = (amount: number): string => {
@@ -161,6 +162,17 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [careJourneyEvents, setCareJourneyEvents] = useState<CareJourneyEvent[]>(INITIAL_CARE_JOURNEY_EVENTS);
   const [outreachRecords, setOutreachRecords] = useState<OutreachRecord[]>([]);
   const [activeCareLoopPatientId, setActiveCareLoopPatientId] = useState<string>('pat-101');
+
+  useEffect(() => {
+    const storedLanguage = window.localStorage.getItem('healthcareos-language');
+    if (storedLanguage === 'bn') setLanguageState('bn');
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = language === 'bn' ? 'bn' : 'en';
+    document.documentElement.classList.toggle('font-bengali', language === 'bn');
+    window.localStorage.setItem('healthcareos-language', language);
+  }, [language]);
 
   const addToast = (toast: Omit<ToastMessage, 'id'>) => {
     const id = Math.random().toString(36).substring(2, 9);

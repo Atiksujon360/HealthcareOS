@@ -3,17 +3,12 @@ import {
   Pill, 
   AlertTriangle, 
   CheckCircle2, 
-  Search, 
-  Plus, 
   Minus, 
   Truck, 
   FileCheck, 
   DollarSign, 
-  Calendar, 
-  ShieldCheck, 
-  ArrowUpRight,
-  PackageCheck,
-  RefreshCw
+  ShieldCheck,
+  PackageCheck
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
@@ -23,7 +18,6 @@ export const PharmacyDashboard: React.FC = () => {
     updateInventoryStock, 
     activeConsultation, 
     dispensePrescription,
-    addToast,
     t,
     language,
     formatBDT,

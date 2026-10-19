@@ -15,7 +15,6 @@ import {
   X, 
   Stethoscope, 
   Clock, 
-  HelpCircle,
   ExternalLink,
   ChevronRight,
   LogOut,
@@ -32,6 +31,7 @@ import {
 import { useApp } from '../../context/AppContext';
 import { UserRole } from '../../types';
 import { motion, AnimatePresence } from 'motion/react';
+import { UserAvatar } from '../common/UserAvatar';
 
 interface NavItem {
   id: string;
@@ -185,9 +185,9 @@ export const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   ];
 
   return (
-    <div className="min-h-screen flex bg-[#F8FAFC] text-[#0F172A]">
+    <div className="clinical-shell min-h-screen flex bg-[#F8FAFC] text-[#0F172A]">
       {/* Toast Notification Container */}
-      <div className="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-md w-full pointer-events-none">
+      <div className="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-md w-full pointer-events-none" role="status" aria-live="polite">
         {toasts.map((toast) => (
           <div 
             key={toast.id}
@@ -204,6 +204,7 @@ export const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => 
             <button 
               onClick={() => removeToast(toast.id)}
               className="text-[#94A3B8] hover:text-[#0F172A] text-sm shrink-0 p-1"
+              aria-label="Dismiss notification"
             >
               ×
             </button>
@@ -241,6 +242,7 @@ export const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => 
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
             className="p-1.5 rounded-lg text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-colors"
             title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             <Menu className="w-4 h-4" />
           </button>
@@ -304,18 +306,7 @@ export const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         <div className="p-3 border-t border-[#E2E8F0]">
           {!sidebarCollapsed ? (
             <div className="flex items-center gap-3 p-2 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
-              {currentUser.avatarUrl ? (
-                <img 
-                  src={currentUser.avatarUrl} 
-                  alt={currentUser.name}
-                  referrerPolicy="no-referrer"
-                  className="w-10 h-10 rounded-full object-cover shrink-0 border border-[#CBD5E1]"
-                />
-              ) : (
-                <div className="w-10 h-10 rounded-full bg-[#E6F4F1] text-[#0F766E] font-semibold flex items-center justify-center shrink-0 text-sm">
-                  {currentUser.name.slice(0, 2).toUpperCase()}
-                </div>
-              )}
+              <UserAvatar name={currentUser.name} src={currentUser.avatarUrl} />
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-semibold text-[#0F172A] truncate">{currentUser.name}</p>
                 <p className="text-[11px] text-[#64748B] truncate">{currentUser.title || currentUser.role}</p>
@@ -323,18 +314,7 @@ export const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => 
             </div>
           ) : (
             <div className="flex justify-center">
-              {currentUser.avatarUrl ? (
-                <img 
-                  src={currentUser.avatarUrl} 
-                  alt={currentUser.name}
-                  referrerPolicy="no-referrer"
-                  className="w-9 h-9 rounded-full object-cover border border-[#CBD5E1]"
-                />
-              ) : (
-                <div className="w-9 h-9 rounded-full bg-[#E6F4F1] text-[#0F766E] font-bold flex items-center justify-center text-xs">
-                  {currentUser.name.slice(0, 2).toUpperCase()}
-                </div>
-              )}
+              <UserAvatar name={currentUser.name} src={currentUser.avatarUrl} size="sm" />
             </div>
           )}
         </div>
@@ -369,6 +349,7 @@ export const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => 
             <button
               onClick={() => setMobileMenuOpen(true)}
               className="lg:hidden p-2 text-[#64748B] hover:text-[#0F172A] rounded-lg"
+              aria-label="Open navigation menu"
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -387,6 +368,8 @@ export const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => 
               <button
                 onClick={() => setShowBranchMenu(!showBranchMenu)}
                 className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-[#0A192F] bg-[#F1F5F9] hover:bg-[#E2E8F0] rounded-lg transition-colors"
+                aria-expanded={showBranchMenu}
+                aria-haspopup="menu"
               >
                 <Building2 className="w-3.5 h-3.5 text-[#0F766E]" />
                 <span className="hidden md:inline truncate max-w-[210px]">{selectedBranch}</span>
@@ -394,7 +377,7 @@ export const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => 
                 <ChevronDown className="w-3 h-3 text-[#64748B]" />
               </button>
               {showBranchMenu && (
-                <div className="absolute left-0 mt-1 w-64 bg-white border border-[#E2E8F0] rounded-xl shadow-lg py-1 z-50">
+                <div className="absolute left-0 mt-1 w-64 bg-white border border-[#E2E8F0] rounded-xl shadow-lg py-1 z-50" role="menu">
                   <div className="px-3 py-1.5 text-[11px] font-semibold text-[#64748B] uppercase tracking-wider">
                     Select Hospital Branch
                   </div>
@@ -408,6 +391,7 @@ export const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => 
                       className={`w-full text-left px-3 py-2 text-xs hover:bg-[#F8FAFC] transition-colors ${
                         selectedBranch === b ? 'text-[#0F766E] font-semibold bg-[#E6F4F1]' : 'text-[#0F172A]'
                       }`}
+                      role="menuitem"
                     >
                       {b}
                     </button>
@@ -454,6 +438,7 @@ export const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => 
               <input
                 type="text"
                 placeholder={t('searchPlaceholder')}
+                aria-label={t('searchPlaceholder')}
                 value={globalSearchQuery}
                 onChange={(e) => setGlobalSearchQuery(e.target.value)}
                 className="w-full pl-9 pr-3 py-1.5 text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] transition-all"
@@ -517,6 +502,8 @@ export const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => 
                 onClick={() => setShowNotifications(!showNotifications)}
                 className="p-2 text-[#64748B] hover:text-[#0F172A] hover:bg-[#F1F5F9] rounded-xl relative transition-colors"
                 title="Notifications"
+                aria-label="Notifications"
+                aria-expanded={showNotifications}
               >
                 <Bell className="w-4 h-4" />
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#0F766E]"></span>
@@ -554,19 +541,10 @@ export const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => 
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="flex items-center gap-2 p-1 rounded-xl hover:bg-[#F1F5F9] transition-colors"
+                aria-label="Open user menu"
+                aria-expanded={showUserMenu}
               >
-                {currentUser.avatarUrl ? (
-                  <img 
-                    src={currentUser.avatarUrl} 
-                    alt={currentUser.name}
-                    referrerPolicy="no-referrer"
-                    className="w-8 h-8 rounded-full object-cover border border-[#CBD5E1]"
-                  />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-[#E6F4F1] text-[#0F766E] font-bold flex items-center justify-center text-xs">
-                    {currentUser.name.slice(0, 2).toUpperCase()}
-                  </div>
-                )}
+                <UserAvatar name={currentUser.name} src={currentUser.avatarUrl} size="sm" />
                 <ChevronDown className="w-3.5 h-3.5 text-[#64748B]" />
               </button>
 
@@ -626,6 +604,7 @@ export const Shell: React.FC<{ children: React.ReactNode }> = ({ children }) => 
                 <button 
                   onClick={() => setMobileMenuOpen(false)}
                   className="p-1 rounded-lg text-[#64748B] hover:text-[#0F172A]"
+                  aria-label="Close navigation menu"
                 >
                   <X className="w-5 h-5" />
                 </button>

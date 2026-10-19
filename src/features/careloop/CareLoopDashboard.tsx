@@ -1,42 +1,30 @@
 import React, { useState, useMemo } from 'react';
 import { 
   ShieldCheck, 
-  Activity, 
   AlertTriangle, 
   CheckCircle2, 
   Clock, 
   Calendar, 
   Send, 
-  FileText, 
   Stethoscope, 
   Pill, 
   UserCheck, 
-  ArrowRight, 
-  ChevronRight, 
   Filter, 
   Search, 
   Sparkles, 
-  Phone, 
   MessageSquare, 
   X, 
-  ExternalLink, 
-  RefreshCw, 
-  Eye, 
   Building2, 
-  HelpCircle, 
   TrendingUp, 
   AlertCircle, 
-  Share2, 
   Lock, 
   Check, 
-  Zap, 
-  ChevronDown 
+  Zap
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { useApp } from '../../context/AppContext';
-import { CareGap, CareJourneyEvent, PatientBarrierType, CareGapSeverity, CareGapType } from '../../types/careLoop';
+import { CareGap, PatientBarrierType, CareGapSeverity } from '../../types/careLoop';
 import { CareLoopEngine } from '../../services/careLoopEngine';
-import { PATIENT_CONTINUITY_METRICS } from '../../data/mockCareLoopData';
 import { AnimatedCounter, CelebrationBurst } from '../../components/common/AnimatedTelemetry';
 
 export const CareLoopDashboard: React.FC = () => {
@@ -54,9 +42,7 @@ export const CareLoopDashboard: React.FC = () => {
     addAppointment,
     addToast,
     language,
-    t,
     formatNum,
-    currentUser,
     currentRole,
     setActiveView
   } = useApp();

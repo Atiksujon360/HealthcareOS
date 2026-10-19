@@ -1,17 +1,10 @@
 import React, { useState } from 'react';
 import { 
-  Truck, 
   MapPin, 
-  Phone, 
   Navigation, 
-  CheckCircle2, 
-  AlertCircle, 
-  Clock, 
   ShieldCheck, 
   ArrowRight,
-  PackageCheck,
-  ChevronRight,
-  FileCheck
+  PackageCheck
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { DeliveryOrder } from '../../types';

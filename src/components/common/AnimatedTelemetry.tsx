@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Activity, Heart, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Heart, Sparkles, CheckCircle2 } from 'lucide-react';
 
 /**
  * Animated ECG Waveform Monitor with live BPM telemetry and pulsing heart
@@ -230,7 +230,6 @@ export const AnimatedCounter: React.FC<{
   const [displayValue, setDisplayValue] = useState(0);
 
   useEffect(() => {
-    let start = 0;
     const duration = 800; // ms
     const startTime = performance.now();
 

@@ -5,21 +5,13 @@ import {
   Users, 
   DollarSign, 
   FileText, 
-  Activity, 
-  Server, 
-  AlertTriangle, 
-  CheckCircle2, 
-  Plus, 
-  Search,
-  ExternalLink,
-  Lock
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 export const AdminDashboard: React.FC = () => {
   const { organizations, auditLogs, addToast, t, language, formatBDT, formatNum } = useApp();
   const [activeTab, setActiveTab] = useState<'organizations' | 'audit' | 'plans' | 'security'>('organizations');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery] = useState('');
 
   const filteredOrgs = organizations.filter(o => 
     o.name.toLowerCase().includes(searchQuery.toLowerCase()) ||

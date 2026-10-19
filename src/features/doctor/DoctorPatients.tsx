@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
 import { 
-  Users, 
   Search, 
-  FileText, 
   Phone, 
   Mail, 
   ShieldCheck, 
-  ChevronRight, 
   AlertTriangle,
   Stethoscope,
-  MapPin,
-  Sparkles
+  Sparkles,
+  ChevronRight
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { PatientRecord } from '../../types';

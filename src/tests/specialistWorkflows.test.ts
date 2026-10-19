@@ -4,7 +4,6 @@
  */
 
 import { MOCK_CHAMBERS, MOCK_CHAMBER_ASSISTANTS, MOCK_DUPLICATE_CANDIDATES, MOCK_INVESTIGATIONS, MOCK_REFERRALS, MOCK_SPECIALIST_PATIENT_BRIEF } from '../data/mockSpecialistData';
-import { ReferralLifecycleStatus } from '../types/specialist';
 
 export function runSpecialistWorkflowTests(): { passed: number; failed: number; results: { test: string; status: 'PASSED' | 'FAILED'; message: string }[] } {
   const results: { test: string; status: 'PASSED' | 'FAILED'; message: string }[] = [];

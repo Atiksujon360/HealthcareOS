@@ -1,16 +1,8 @@
 import React, { useState } from 'react';
 import { 
   Calendar as CalendarIcon, 
-  Clock, 
-  ChevronLeft, 
-  ChevronRight, 
   Video, 
-  Building2, 
-  Plus, 
-  CheckCircle2, 
-  User, 
-  Filter,
-  MapPin
+  Building2
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 

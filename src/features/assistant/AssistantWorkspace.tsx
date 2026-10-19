@@ -1,23 +1,9 @@
 import React, { useState } from 'react';
 import { 
-  Building2, 
-  Users, 
-  Calendar, 
-  Clock, 
-  CheckCircle2, 
-  AlertCircle, 
   Lock, 
-  Search, 
   Plus, 
-  FileText, 
-  Check, 
-  ShieldCheck, 
   Upload, 
-  Eye, 
   EyeOff, 
-  ArrowRight,
-  Phone,
-  DollarSign,
   Ticket
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
@@ -25,16 +11,9 @@ import { MOCK_CHAMBERS, MOCK_CHAMBER_ASSISTANTS } from '../../data/mockSpecialis
 
 export const AssistantWorkspace: React.FC = () => {
   const { 
-    clinicQueue, 
-    advanceQueue, 
-    appointments, 
     addAppointment,
     addToast, 
-    language, 
-    t, 
-    formatNum, 
-    formatBDT,
-    setActiveView 
+    formatBDT
   } = useApp();
 
   const assistant = MOCK_CHAMBER_ASSISTANTS[0];

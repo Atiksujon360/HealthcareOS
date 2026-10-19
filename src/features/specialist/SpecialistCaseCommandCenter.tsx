@@ -3,47 +3,28 @@ import {
   Building2, 
   Stethoscope, 
   FileText, 
-  Calendar, 
   Clock, 
-  Search, 
-  Filter, 
   CheckCircle2, 
   AlertTriangle, 
   AlertCircle, 
   ShieldCheck, 
-  ChevronRight, 
-  ArrowRight, 
   Sparkles, 
-  UserCheck, 
   X, 
-  Send, 
   Check, 
-  Eye, 
-  Upload, 
   Lock, 
-  HelpCircle, 
-  TrendingUp, 
-  RefreshCw, 
-  ExternalLink,
-  MapPin,
-  Pill,
   Award,
-  BookOpen,
-  ArrowUpRight
+  ExternalLink
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { 
   Chamber, 
   InvestigationReport, 
-  InvestigationResultItem,
   ReferralSecondOpinion, 
   ReferralLifecycleStatus, 
-  DuplicatePatientCandidate,
-  SpecialistPatientBrief
+  DuplicatePatientCandidate
 } from '../../types/specialist';
 import { 
   MOCK_CHAMBERS, 
-  MOCK_CHAMBER_ASSISTANTS, 
   MOCK_DUPLICATE_CANDIDATES, 
   MOCK_INVESTIGATIONS, 
   MOCK_REFERRALS,
@@ -58,11 +39,8 @@ export const SpecialistCaseCommandCenter: React.FC = () => {
     setActiveView, 
     addToast, 
     language, 
-    t, 
     formatNum, 
-    formatBDT,
-    careGaps,
-    resolveCareGap
+    formatBDT
   } = useApp();
 
   // Mode: Segment 1 (Solo Consultant Chamber) vs Segment 2 (Specialist Professor Pro)
@@ -72,7 +50,7 @@ export const SpecialistCaseCommandCenter: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'brief' | 'longitudinal' | 'investigations' | 'referrals' | 'careloop_queue' | 'chamber_ops'>('brief');
 
   // Multi-chamber state
-  const [chambers, setChambers] = useState<Chamber[]>(MOCK_CHAMBERS);
+  const [chambers] = useState<Chamber[]>(MOCK_CHAMBERS);
   const [selectedChamberId, setSelectedChamberId] = useState<string>('chm-001');
   const selectedChamber = useMemo(() => chambers.find(c => c.id === selectedChamberId) || chambers[0], [chambers, selectedChamberId]);
 

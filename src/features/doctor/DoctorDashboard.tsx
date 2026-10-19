@@ -2,29 +2,19 @@ import React, { useState } from 'react';
 import { 
   Calendar, 
   Clock, 
-  Users, 
   CheckCircle2, 
   FileEdit, 
   Plus, 
-  Search, 
-  Filter, 
   Video, 
   Building2, 
   ArrowUpRight, 
-  ChevronRight, 
-  AlertCircle, 
   Stethoscope, 
-  FileText, 
   TrendingUp, 
-  Pill,
   Check,
   Eye,
-  MapPin,
-  ShieldCheck,
-  BadgeAlert,
-  Sparkles
+  ChevronRight
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { useApp } from '../../context/AppContext';
 import { Appointment } from '../../types';
 import { 
@@ -44,7 +34,6 @@ export const DoctorDashboard: React.FC = () => {
     globalSearchQuery,
     t,
     language,
-    formatBDT,
     formatNum,
     careGaps
   } = useApp();
@@ -126,9 +115,9 @@ export const DoctorDashboard: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="clinical-overview space-y-6">
       {/* Welcome Banner */}
-      <div className="bg-white border border-[#E2E8F0] rounded-3xl p-6 lg:p-7 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-5 relative overflow-hidden">
+      <section className="bg-white border border-[#CBD5E1] rounded-2xl p-6 lg:p-7 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5 relative overflow-hidden" aria-labelledby="doctor-overview-title">
         <div className="relative z-10">
           <div className="flex items-center gap-2 text-xs font-semibold text-[#0F766E] uppercase tracking-wider mb-1.5">
             <span className="w-2 h-2 rounded-full bg-[#0F766E]" />
@@ -140,7 +129,7 @@ export const DoctorDashboard: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0A192F] font-display tracking-tight">
+            <h1 id="doctor-overview-title" className="text-2xl sm:text-3xl font-extrabold text-[#0A192F] font-display tracking-tight">
               {t('doctorGreeting')}
             </h1>
           </div>
@@ -174,14 +163,14 @@ export const DoctorDashboard: React.FC = () => {
             {t('bookPatient')}
           </button>
         </div>
-      </div>
+      </section>
 
       {/* KPI Cards Strip with Motion and Animated Counters */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1 */}
         <motion.div 
           whileHover={{ y: -3, transition: { duration: 0.2 } }}
-          className="bg-white border border-[#E2E8F0] rounded-2xl p-4 shadow-xs card-interactive"
+          className="bg-white border border-[#CBD5E1] rounded-xl p-4 shadow-sm card-interactive"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-[#64748B]">{t('todayAppointments')}</span>
@@ -204,7 +193,7 @@ export const DoctorDashboard: React.FC = () => {
         {/* Card 2 */}
         <motion.div 
           whileHover={{ y: -3, transition: { duration: 0.2 } }}
-          className="bg-white border border-[#E2E8F0] rounded-2xl p-4 shadow-xs card-interactive"
+          className="bg-white border border-[#CBD5E1] rounded-xl p-4 shadow-sm card-interactive"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-[#64748B]">{t('waitingTriage')}</span>
@@ -224,7 +213,7 @@ export const DoctorDashboard: React.FC = () => {
         {/* Card 3 */}
         <motion.div 
           whileHover={{ y: -3, transition: { duration: 0.2 } }}
-          className="bg-white border border-[#E2E8F0] rounded-2xl p-4 shadow-xs card-interactive"
+          className="bg-white border border-[#CBD5E1] rounded-xl p-4 shadow-sm card-interactive"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-[#64748B]">{t('completedConsultations')}</span>
@@ -244,7 +233,7 @@ export const DoctorDashboard: React.FC = () => {
         {/* Card 4 */}
         <motion.div 
           whileHover={{ y: -3, transition: { duration: 0.2 } }}
-          className="bg-white border border-[#E2E8F0] rounded-2xl p-4 shadow-xs card-interactive"
+          className="bg-white border border-[#CBD5E1] rounded-xl p-4 shadow-sm card-interactive"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-[#64748B]">{t('pendingDocumentation')}</span>

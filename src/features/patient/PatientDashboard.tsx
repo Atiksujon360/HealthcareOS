@@ -7,18 +7,11 @@ import {
   Truck, 
   Video, 
   Building2, 
-  ChevronRight, 
   CheckCircle2, 
   Plus, 
-  AlertCircle, 
-  ArrowRight,
   ShieldCheck,
   Download,
-  ExternalLink,
-  MapPin,
-  RefreshCw,
-  CreditCard,
-  Phone
+  MapPin
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 

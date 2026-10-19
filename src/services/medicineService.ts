@@ -60,7 +60,6 @@ function sanitizeQuery(query: string): string[] {
 export async function searchMedicines({
   query,
   provider,
-  locale = 'en-BD',
   signal,
 }: SearchMedicinesParams): Promise<MedicineSearchResult[]> {
   // Simulate network latency (250ms for local, 600ms for simulated online)

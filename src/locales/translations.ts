@@ -1,5 +1,17 @@
 export type Language = 'en' | 'bn';
 
+/** Repairs legacy UTF-8 text that was persisted as Latin-1 mojibake. */
+export const normalizeLocalizedText = (value: string): string => {
+  if (!/[àÂÃ]/.test(value)) return value;
+  try {
+    const bytes = Uint8Array.from(value, (character) => character.charCodeAt(0) & 0xff);
+    const repaired = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+    return repaired.includes('�') ? value : repaired;
+  } catch {
+    return value;
+  }
+};
+
 export const formatCurrency = (amount: number, language: Language = 'en'): string => {
   if (language === 'bn') {
     const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];

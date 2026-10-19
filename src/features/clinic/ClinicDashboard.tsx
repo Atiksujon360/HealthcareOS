@@ -4,27 +4,14 @@ import {
   Users, 
   Clock, 
   Stethoscope, 
-  Activity, 
-  Calendar, 
-  CheckCircle2, 
-  AlertCircle, 
   DollarSign, 
-  ShieldCheck, 
-  ArrowUpRight,
-  ChevronRight,
-  Filter,
-  Plus,
-  MapPin
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 export const ClinicDashboard: React.FC = () => {
   const { 
-    clinicQueue, 
-    advanceQueue, 
-    appointments, 
-    selectedBranch, 
-    setSelectedBranch,
+    clinicQueue,
+    advanceQueue,
     addToast,
     t,
     language,

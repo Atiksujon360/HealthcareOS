@@ -10,18 +10,13 @@ import {
   ArrowRight, 
   CheckCircle2, 
   Lock, 
-  Zap, 
-  Calendar,
-  Layers,
-  FileCheck,
-  PhoneCall,
-  MapPin
+  Zap
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { UserRole } from '../../types';
 
 export const LandingPage: React.FC = () => {
-  const { setCurrentRole, setActiveView, t, language, formatBDT } = useApp();
+  const { setCurrentRole, setActiveView, t, language } = useApp();
 
   const handleLaunchRole = (role: UserRole) => {
     setCurrentRole(role);

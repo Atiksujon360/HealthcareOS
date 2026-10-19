@@ -1,19 +1,13 @@
 import React, { useState } from 'react';
 import { 
   Check, 
-  ShieldCheck, 
   Building2, 
   Stethoscope, 
-  DollarSign, 
-  Zap, 
-  HelpCircle,
-  ArrowRight,
-  CreditCard
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 export const SubscriptionPlans: React.FC = () => {
-  const { addToast, setActiveView, t, language, formatBDT, formatNum } = useApp();
+  const { addToast, t, language, formatBDT } = useApp();
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual');
   const [targetAudience, setTargetAudience] = useState<'individual' | 'organization'>('organization');
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppProvider, useApp } from './context/AppContext';
+import { useApp } from './context/AppContext';
 import { Shell } from './components/layout/Shell';
 import { DoctorDashboard } from './features/doctor/DoctorDashboard';
 import { ConsultationWorkspace } from './features/doctor/ConsultationWorkspace';
@@ -72,10 +72,4 @@ const MainRouter: React.FC = () => {
   );
 };
 
-export default function App() {
-  return (
-    <AppProvider>
-      <MainRouter />
-    </AppProvider>
-  );
-}
+export default MainRouter;

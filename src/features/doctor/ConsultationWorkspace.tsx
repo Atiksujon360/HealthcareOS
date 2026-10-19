@@ -5,38 +5,26 @@ import {
   Save, 
   CheckCircle2, 
   FileCheck, 
-  Plus, 
-  Trash2, 
   AlertTriangle, 
   Pill, 
   FlaskConical, 
   Calendar, 
   Eye, 
-  Lock, 
-  Clock, 
-  User, 
-  History,
-  FileText,
-  Printer,
   QrCode,
   ShieldCheck,
   Sparkles,
-  Heart
+  Heart,
+  Printer
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
 import { useApp } from '../../context/AppContext';
-import { PrescriptionDrug } from '../../types';
-import { PrescriptionBuilder, MedicineSearch } from './components/PrescriptionBuilder';
+import { PrescriptionBuilder } from './components/PrescriptionBuilder';
 import { CelebrationBurst } from '../../components/common/AnimatedTelemetry';
-
-export { MedicineSearch, PrescriptionBuilder };
 
 export const ConsultationWorkspace: React.FC = () => {
   const { 
     activeConsultation, 
     updateConsultation, 
     signAndFinalizeConsultation, 
-    addPrescriptionToConsultation, 
     setActiveView,
     addToast,
     t,
